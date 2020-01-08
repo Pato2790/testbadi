@@ -7,8 +7,6 @@ services:
     image: badi/badi_fe
     ports:
       - '3000:3000'
-    volumes:
-      - ./frontend:/app
     depends_on:
       - backend
 
@@ -43,8 +41,6 @@ services:
     image: badi/badi_be
     ports:
       - '5000:5000'
-    volumes:
-      - ./backend:/app
     depends_on:
       - mysql
 
