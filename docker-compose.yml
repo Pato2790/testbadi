@@ -1,0 +1,76 @@
+version: '3.7'
+services:
+  app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: badi/badi_fe
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+
+  mysql:
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: testbadi
+    volumes:
+      - ./.data/db:/var/lib/mysql
+      - ./db:/docker-entrypoint-initdb.d:ro
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: root
+      PMA_ARBITRARY: 1
+    ports:
+      - 8000:80
+    depends_on:
+      - mysql
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: badi/badi_be
+    ports:
+      - '5000:5000'
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - mysql
+
+  backend-dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: badi/badi_be
+    ports:
+      - '5000:5000'
+      - '9229:9229'
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - mysql
+      - phpmyadmin
+    command: 'npm run debug'
+
+  app-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: badi/badi_fe
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend-dev

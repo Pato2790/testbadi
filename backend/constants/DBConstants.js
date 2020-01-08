@@ -1,0 +1,1 @@
+module.exports = ["mysql", "3306", "root", "root", "testbadi"];
